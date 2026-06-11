@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  SELLER
+  WAREHOUSE
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+  OUT_OF_STOCK
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT_IN
+  ADJUSTMENT_OUT
+  SALE
+  RETURN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PREPARING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  MERCADO_PAGO
+}
+
+enum CashMovementType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  role           UserRole        @default(SELLER)
+  stockMovements StockMovement[]
+  cashMovements  CashMovement[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  sku            String          @unique
+  internalCode   String          @unique
+  name           String
+  slug           String          @unique
+  description    String
+  categoryId     String
+  category       Category        @relation(fields: [categoryId], references: [id])
+  subcategoryId  String?
+  subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
+  collectionId   String?
+  collection     Collection?     @relation(fields: [collectionId], references: [id])
+  costPrice      Decimal
+  salePrice      Decimal
+  margin         Decimal
+  weight         String?
+  stock          Int             @default(0)
+  minStock       Int             @default(0)
+  status         ProductStatus   @default(DRAFT)
+  images         ProductImage[]
+  stockMovements StockMovement[]
+  orderItems     OrderItem[]
+  favorites      Favorite[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  description   String?
+  products      Product[]
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id])
+  products   Product[]
+}
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  active      Boolean   @default(true)
+  products    Product[]
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  alt       String?
+  position  Int     @default(0)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Customer {
+  id        String     @id @default(cuid())
+  name      String
+  email     String?    @unique
+  whatsapp  String?
+  birthday  DateTime?
+  addresses String[]
+  orders    Order[]
+  favorites Favorite[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([customerId, productId])
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  number          String        @unique
+  customerId      String
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  status          OrderStatus   @default(PENDING)
+  paymentMethod   PaymentMethod
+  shippingAddress String
+  total           Decimal
+  items           OrderItem[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal
+}
+
+model StockMovement {
+  id        String            @id @default(cuid())
+  productId String
+  product   Product           @relation(fields: [productId], references: [id])
+  type      StockMovementType
+  quantity  Int
+  reason    String
+  userId    String
+  user      User              @relation(fields: [userId], references: [id])
+  notes     String?
+  createdAt DateTime          @default(now())
+}
+
+model CashMovement {
+  id        String           @id @default(cuid())
+  type      CashMovementType
+  amount    Decimal
+  method    PaymentMethod
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  notes     String?
+  createdAt DateTime         @default(now())
+}
