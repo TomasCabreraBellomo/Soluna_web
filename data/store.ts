@@ -439,7 +439,10 @@ export const adminNavigation = [
   { label: "Ventas", href: "/admin/ventas", icon: ReceiptText },
   { label: "Pedidos", href: "/admin/pedidos", icon: PackageCheck },
   { label: "Clientes", href: "/admin/clientes", icon: Heart },
-  { label: "Reportes", href: "/admin/reportes", icon: Star }
+  { label: "Reportes", href: "/admin/reportes", icon: Star },
+  { label: "Colecciones", href: "/admin/colecciones", icon: Gift },
+  { label: "Usuarios", href: "/admin/usuarios", icon: ShieldCheck },
+  { label: "Caja", href: "/admin/caja", icon: Banknote }
 ];
 
 export const orders = [

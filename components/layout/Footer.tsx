@@ -8,7 +8,7 @@ const columns = [
       ["Preguntas frecuentes", "#"],
       ["Cambios y devoluciones", "#"],
       ["Seguimiento de pedidos", "#"],
-      ["Acceso interno", "/admin"]
+      ["Acceso interno", "/admin/login"]
     ]
   },
   {

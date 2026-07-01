@@ -34,11 +34,27 @@ export function getCurrentUser(): MockUser | null {
   const stored = window.localStorage.getItem(AUTH_STORAGE_KEY);
   if (!stored) return null;
   try {
-    return JSON.parse(stored) as MockUser;
+    const parsed = JSON.parse(stored) as MockUser;
+    if (!isValidAdminSession(parsed)) {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+      return null;
+    }
+    return parsed;
   } catch {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
     return null;
   }
+}
+
+export function isValidAdminSession(value: unknown): value is MockUser {
+  if (!value || typeof value !== "object") return false;
+  const user = value as Partial<MockUser>;
+  return Boolean(
+    user.id &&
+      user.name &&
+      user.email &&
+      (user.role === "ADMIN" || user.role === "SELLER" || user.role === "WAREHOUSE")
+  );
 }
 
 export function isAuthenticated() {
