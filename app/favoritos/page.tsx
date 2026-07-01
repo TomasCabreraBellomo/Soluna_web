@@ -1,14 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { useCommerce } from "@/components/providers/CommerceProvider";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { products } from "@/data/store";
+import type { Product } from "@/data/store";
 
 export default function FavoritesPage() {
   const { favoriteIds } = useCommerce();
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    void fetch("/api/products").then((response) => response.json()).then(setProducts);
+  }, []);
+
   const favorites = products.filter((product) => favoriteIds.includes(product.id) || product.isFavorite);
 
   return (

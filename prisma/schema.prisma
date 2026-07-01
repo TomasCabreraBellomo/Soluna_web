@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -21,8 +21,9 @@ enum ProductStatus {
 }
 
 enum StockMovementType {
-  IN
-  OUT
+  INITIAL_ENTRY
+  ENTRY
+  EXIT
   ADJUSTMENT_IN
   ADJUSTMENT_OUT
   SALE
@@ -67,6 +68,14 @@ model Product {
   name           String
   slug           String          @unique
   description    String
+  material       String?
+  tipo           String?
+  cuotas         String?
+  badge          String?
+  isBestSeller   Boolean         @default(false)
+  isNew          Boolean         @default(false)
+  isFavorite     Boolean         @default(false)
+  notes          String?
   categoryId     String
   category       Category        @relation(fields: [categoryId], references: [id])
   subcategoryId  String?
@@ -131,7 +140,7 @@ model Customer {
   email     String?    @unique
   whatsapp  String?
   birthday  DateTime?
-  addresses String[]
+  addresses Json?
   orders    Order[]
   favorites Favorite[]
   createdAt DateTime   @default(now())
@@ -179,6 +188,8 @@ model StockMovement {
   product   Product           @relation(fields: [productId], references: [id])
   type      StockMovementType
   quantity  Int
+  previousStock Int             @default(0)
+  newStock      Int             @default(0)
   reason    String
   userId    String
   user      User              @relation(fields: [userId], references: [id])

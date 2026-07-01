@@ -1,8 +1,12 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminTable } from "@/components/admin/AdminTable";
-import { customers } from "@/data/store";
+import { getCustomers } from "@/lib/admin-db";
 
-export default function AdminCustomersPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AdminCustomersPage() {
+  const customers = await getCustomers();
+
   return (
     <AdminLayout title="Clientes">
       <div className="mb-6 flex flex-wrap gap-3">

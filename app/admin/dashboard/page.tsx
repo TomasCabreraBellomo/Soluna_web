@@ -16,9 +16,11 @@ export default function AdminDashboardPage() {
   const [movements, setMovements] = useState<StockMovement[]>([]);
 
   useEffect(() => {
-    setProducts(getProducts());
-    setSales(getSales());
-    setMovements(getStockMovements());
+    void Promise.all([getProducts(), getSales(), getStockMovements()]).then(([products, sales, movements]) => {
+      setProducts(products);
+      setSales(sales);
+      setMovements(movements);
+    });
   }, []);
 
   const today = new Date().toISOString().slice(0, 10);

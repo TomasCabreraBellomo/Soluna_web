@@ -3,17 +3,17 @@
 import { useMemo, useState } from "react";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { products } from "@/data/store";
+import type { Product } from "@/data/store";
 
 const tabs = ["Más vendidos", "Nuevos ingresos", "Favoritos"] as const;
 
-export function FeaturedProducts() {
+export function FeaturedProducts({ products }: { products: Product[] }) {
   const [active, setActive] = useState<(typeof tabs)[number]>("Más vendidos");
   const visible = useMemo(() => {
     if (active === "Nuevos ingresos") return products.filter((product) => product.isNew);
     if (active === "Favoritos") return products.filter((product) => product.isFavorite);
     return products.filter((product) => product.isBestSeller || product.badge === "Más vendido");
-  }, [active]);
+  }, [active, products]);
 
   return (
     <section className="container-page py-20">

@@ -17,8 +17,12 @@ export default function AdminProductsPage() {
   const [collection, setCollection] = useState("");
   const [message, setMessage] = useState("");
 
+  async function reload() {
+    setProducts(await getProducts());
+  }
+
   useEffect(() => {
-    setProducts(getProducts());
+    void reload();
     const flash = window.localStorage.getItem("soluna-admin-flash");
     if (flash) {
       setMessage(flash);
@@ -39,10 +43,10 @@ export default function AdminProductsPage() {
     [category, collection, products, query]
   );
 
-  function handleDelete(product: AdminProduct) {
+  async function handleDelete(product: AdminProduct) {
     if (!window.confirm(`Eliminar ${product.name}? Esta accion no modifica movimientos historicos.`)) return;
-    deleteProduct(product.id);
-    setProducts(getProducts());
+    await deleteProduct(product.id);
+    await reload();
     setMessage("Producto eliminado correctamente.");
   }
 

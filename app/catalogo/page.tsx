@@ -2,14 +2,18 @@ import type { Metadata } from "next";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { PublicLayout } from "@/components/layout/PublicLayout";
-import { categories, collections, products } from "@/data/store";
+import { getStoreCategories, getStoreCollections, getStoreProducts } from "@/lib/db-store";
 
 export const metadata: Metadata = {
   title: "Catalogo Soluna | Charms, pulseras y joyas de plata 925",
   description: "Explora el catalogo de Soluna con filtros por categoria, coleccion, precio y disponibilidad."
 };
 
-export default function CatalogPage() {
+export const dynamic = "force-dynamic";
+
+export default async function CatalogPage() {
+  const [products, categories, collections] = await Promise.all([getStoreProducts(), getStoreCategories(), getStoreCollections()]);
+
   return (
     <PublicLayout>
       <section className="bg-[linear-gradient(135deg,#FAF8F5_0%,#E8D9D7_58%,#FFFFFF_100%)]">

@@ -26,13 +26,14 @@ export default function AdminSalesPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  function reload() {
-    setProducts(getProducts());
-    setSales(getSales());
+  async function reload() {
+    const [products, sales] = await Promise.all([getProducts(), getSales()]);
+    setProducts(products);
+    setSales(sales);
   }
 
   useEffect(() => {
-    reload();
+    void reload();
   }, []);
 
   const total = useMemo(() => items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0), [items]);
@@ -51,12 +52,12 @@ export default function AdminSalesPage() {
     );
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
       const user = getCurrentUser();
       if (!user) throw new Error("Sesion expirada.");
-      createSale({
+      await createSale({
         customerName,
         customerWhatsapp,
         paymentMethod,
@@ -70,7 +71,7 @@ export default function AdminSalesPage() {
       setCustomerName("");
       setCustomerWhatsapp("");
       setNotes("");
-      reload();
+      await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo registrar la venta.");
       setMessage("");

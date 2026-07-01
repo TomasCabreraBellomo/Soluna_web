@@ -8,14 +8,19 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { InstagramSection } from "@/components/home/InstagramSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { getStoreCategories, getStoreProducts } from "@/lib/db-store";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [products, categories] = await Promise.all([getStoreProducts(), getStoreCategories()]);
+
   return (
     <PublicLayout>
       <HeroSection />
-      <FeaturedCategories />
+      <FeaturedCategories categories={categories} />
       <EmotionalSection />
-      <FeaturedProducts />
+      <FeaturedProducts products={products} />
       <BraceletBuilderSection />
       <BenefitsSection />
       <InstagramSection />

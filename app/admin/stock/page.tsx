@@ -21,13 +21,14 @@ export default function AdminStockPage() {
   const [error, setError] = useState("");
   const [filters, setFilters] = useState({ query: "", category: "", collection: "", status: "", movementType: "" });
 
-  function reload() {
-    setProducts(getProducts());
-    setMovements(getStockMovements());
+  async function reload() {
+    const [products, movements] = await Promise.all([getProducts(), getStockMovements()]);
+    setProducts(products);
+    setMovements(movements);
   }
 
   useEffect(() => {
-    reload();
+    void reload();
     const search = new URLSearchParams(window.location.search);
     if (search.get("accion") === "salida") setMode("EXIT");
     if (search.get("accion") === "ajuste" || search.get("producto")) setMode("ADJUST");
@@ -53,7 +54,7 @@ export default function AdminStockPage() {
   function handleSuccess(text: string) {
     setMessage(text);
     setError("");
-    reload();
+    void reload();
   }
 
   function handleError(error: unknown) {
@@ -116,8 +117,7 @@ export default function AdminStockPage() {
           try {
             const user = getCurrentUser();
             if (!user) throw new Error("Sesion expirada.");
-            registerStockEntry({ ...data, user });
-            handleSuccess("Entrada de stock registrada correctamente.");
+            void registerStockEntry({ ...data, user }).then(() => handleSuccess("Entrada de stock registrada correctamente.")).catch(handleError);
           } catch (err) {
             handleError(err);
           }
@@ -126,8 +126,7 @@ export default function AdminStockPage() {
           try {
             const user = getCurrentUser();
             if (!user) throw new Error("Sesion expirada.");
-            registerStockExit({ ...data, user });
-            handleSuccess("Salida de stock registrada correctamente.");
+            void registerStockExit({ ...data, user }).then(() => handleSuccess("Salida de stock registrada correctamente.")).catch(handleError);
           } catch (err) {
             handleError(err);
           }
@@ -137,8 +136,7 @@ export default function AdminStockPage() {
             if (!window.confirm("Confirmar ajuste manual de stock?")) return;
             const user = getCurrentUser();
             if (!user) throw new Error("Sesion expirada.");
-            adjustStock({ ...data, user });
-            handleSuccess("Stock ajustado correctamente.");
+            void adjustStock({ ...data, user }).then(() => handleSuccess("Stock ajustado correctamente.")).catch(handleError);
           } catch (err) {
             handleError(err);
           }

@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { categories } from "@/data/store";
+import type { Category } from "@/data/store";
 
-export function FeaturedCategories() {
+export function FeaturedCategories({ categories }: { categories: Category[] }) {
   return (
     <section className="container-page py-20">
       <SectionHeading eyebrow="Colecciones para empezar" title="Elegí el brillo de tu próxima historia" text="Categorías pensadas para regalar, coleccionar o armar una pulsera con significado propio." />

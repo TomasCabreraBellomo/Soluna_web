@@ -12,11 +12,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [product, setProduct] = useState<AdminProduct | null>(null);
 
   useEffect(() => {
-    setProduct(getProduct(params.id));
+    void getProduct(params.id).then(setProduct);
   }, [params.id]);
 
-  function handleSubmit(values: ProductFormValues) {
-    updateProduct(params.id, {
+  async function handleSubmit(values: ProductFormValues) {
+    await updateProduct(params.id, {
       sku: values.sku,
       internalCode: values.internalCode,
       name: values.name,

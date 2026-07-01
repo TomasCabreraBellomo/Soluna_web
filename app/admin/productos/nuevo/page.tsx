@@ -9,10 +9,10 @@ import { getCurrentUser } from "@/lib/auth";
 export default function NewProductPage() {
   const router = useRouter();
 
-  function handleSubmit(values: ProductFormValues) {
+  async function handleSubmit(values: ProductFormValues) {
     const user = getCurrentUser();
     if (!user) return router.replace("/admin/login");
-    createProduct(
+    await createProduct(
       {
         sku: values.sku,
         internalCode: values.internalCode,

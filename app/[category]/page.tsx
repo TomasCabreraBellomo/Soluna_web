@@ -3,17 +3,16 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { categories, collections, products } from "@/data/store";
+import { getStoreCategories, getStoreCollections, getStoreProducts } from "@/lib/db-store";
 
 const allowedPages = ["charms-disney", "charms-plata-925", "pulseras", "collares", "aritos", "joyeros", "sets", "colecciones", "arma-tu-pulsera"] as const;
 
 type CategoryPageProps = { params: { category: string } };
 
-export function generateStaticParams() {
-  return allowedPages.map((category) => ({ category }));
-}
+export const dynamic = "force-dynamic";
 
-export function generateMetadata({ params }: CategoryPageProps): Metadata {
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const categories = await getStoreCategories();
   const category = categories.find((item) => item.slug === params.category);
   return {
     title: `${category?.name ?? "Colecciones"} | Soluna`,
@@ -21,8 +20,9 @@ export function generateMetadata({ params }: CategoryPageProps): Metadata {
   };
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   if (!allowedPages.includes(params.category as (typeof allowedPages)[number])) notFound();
+  const [products, categories, collections] = await Promise.all([getStoreProducts(), getStoreCategories(), getStoreCollections()]);
 
   if (params.category === "colecciones") {
     return (
